@@ -1,0 +1,59 @@
+version: '2.4'
+
+networks:
+  mysql_net:
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    command: --default-authentication-plugin=mysql_native_password --collation-server=utf8mb4_unicode_ci --character-set-server=utf8mb4
+    volumes:
+     - C:\Users\ASUS\Downloads\book_management\db:/app
+    restart: always
+    mem_limit: 700M
+    mem_reservation: 100M
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: nehadb1
+      MYSQL_USER: neha
+      MYSQL_PASSWORD: 12345
+    ports:
+      - 3307:3306
+    expose:
+      - 3306
+    networks:
+      - mysql_net
+
+  backend:
+    depends_on:
+      - db
+    image: book_management
+    restart: always
+    ports:
+      - 5000:5000
+    environment:
+      DB_HOST: mysql_db
+      DB_PASSWORD: 12345
+      DB_USER : root
+      DB_PORT : 3306
+      DB_DATABASE: nehadb1
+      PORT: 5000
+      HOST: '0.0.0.0'
+    networks:
+      - mysql_net
+
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8090:80
+    environment:
+      PMA_HOST: mysql_db
+      MYSQL_ROOT_PASSWORD: 12345
+    networks:
+      - mysql_net
+
+  
